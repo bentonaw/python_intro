@@ -13,4 +13,4 @@ elif 16 <= result <= 23:
 elif 0 <= result <= 15:
     print("Your grade is: F")
 else:
-    print("Invalid value for the result")
+    print("Invalid score for a grade result")
