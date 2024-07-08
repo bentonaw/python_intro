@@ -1,11 +1,11 @@
 user_input = input("Enter a sequence of numbers each seperated by a space: ")
 user_list = []
 user_input_errors = []
-for input in user_input.split():
-        if input.isdigit():
-            user_list += [int(input)]
-        else:
-            user_input_errors.append(input)            
+for value in user_input.split():
+        try:
+            user_list.append(int(value))
+        except ValueError:
+            user_input_errors.append(value)            
 
 if user_list != []:
     if user_input_errors != []:
