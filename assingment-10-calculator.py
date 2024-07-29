@@ -12,7 +12,6 @@ def is_method_allowed(method, method_allowed):
 def tried_zero_division(method, second_operand):
     return method in ("/", "%", "//") and second_operand == 0
 
-# Calculates answer 
 def calculate(method):
     if method == "+":
         answer = first_operand + second_operand
