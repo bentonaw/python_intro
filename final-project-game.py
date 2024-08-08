@@ -1,6 +1,6 @@
 from random import randint
 
-# generates list of numbers to iterate through for each math quiz
+# Generates list of numbers to iterate through for each math quiz
 def generate_math_quiz_list(number_of_questions):
     quiz_list =[]
 
@@ -22,7 +22,7 @@ def generate_math_quiz_list(number_of_questions):
 
     return quiz_list
 
-# generates list of doors according to number of questions
+# Generates list of doors according to number of questions
 def generate_doors(nr_of_questions):
     list_of_doors = []
     door = 0
@@ -31,12 +31,12 @@ def generate_doors(nr_of_questions):
         list_of_doors.append(door)
     return list_of_doors
 
-# assigns zombie door to a number witihin range of number of questions
+# Assigns zombie door to a number witihin range of number of questions
 def generate_zombie_door(doors_left):
     zombie_door = randint(1,doors_left)
     return zombie_door
 
-# function to create math quiz
+# Function to create math quiz
 def generate_math_quiz(math_operator, math_table, quiz_list, math_quiz_number):
     if math_operator == "*":
             math_quiz = math_table * quiz_list[math_quiz_number]
@@ -47,7 +47,7 @@ def generate_math_quiz(math_operator, math_table, quiz_list, math_quiz_number):
     
     return math_quiz
 
-# function to error handle non integer input
+# Function to error handle non integer input
 def handle_integer_input(prompt, error_message):
     while True:
         try:
@@ -123,23 +123,15 @@ The only way out is to solve a mathematical question and choose the right door t
 
         if len(list_of_doors) != 1:
             print(f"Question: {math_quiz_number + 1} out of {nr_of_questions}, {math_quiz_number} correctly answered quizzes so far")
-            try:
-                if math_operator == "*":
-                    answer = int(input(f"What is {math_table} {math_operator} {quiz_list[math_quiz_number]}: "))
-                else:
-                    answer = int(input(f"What is {quiz_list[math_quiz_number]} {math_operator} {math_table}: "))
-            except ValueError:
-                print("Input should be a number")
-                continue
+            if math_operator == "*":
+                answer = handle_integer_input(f"What is {math_table} {math_operator} {quiz_list[math_quiz_number]}: ","Input should be a number")
+            else:
+                answer = handle_integer_input(f"What is {quiz_list[math_quiz_number]} {math_operator} {math_table}: ","Input should be a number")
         else:
-            try:
-                if math_operator == "*":
-                    answer = int(input(f"Final question! What is {math_table} {math_operator} {quiz_list[math_quiz_number]}: "))
-                else:
-                    answer = int(input(f"Final question! What is {quiz_list[math_quiz_number]} {math_operator} {math_table}: "))
-            except ValueError:
-                print("Input should have been a number")
-                continue
+            if math_operator == "*":
+                answer = handle_integer_input(f"Final question! What is {math_table} {math_operator} {quiz_list[math_quiz_number]}: ","Input should be a number")
+            else:
+                answer = handle_integer_input(f"Final question! What is {quiz_list[math_quiz_number]} {math_operator} {math_table}: ","Input should be a number")
 
         if answer != math_quiz:
             print(f"\nYou gueesed wrong, the correct answer is: {math_quiz}")
@@ -158,7 +150,7 @@ The only way out is to solve a mathematical question and choose the right door t
             for door in list_of_doors:
                 print(door, end="| "),
             
-            chosen_door = int(input("Open door number: "))
+            chosen_door = handle_integer_input("Open door number: ", "There is no door with that sign")
             if chosen_door != zombie_door:
                 print("\nWohoo! No zombies behind this door!")
                 print(f"The zombies were behind door nr {zombie_door}")
