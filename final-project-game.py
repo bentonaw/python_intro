@@ -1,63 +1,61 @@
-from random import randint
+from random import randint, choice
 
 # Generates list of numbers to iterate through for each math quiz
 def generate_math_quiz_list(number_of_questions):
     quiz_list =[]
 
-    if 13 >= number_of_questions:
-        while len(quiz_list) < number_of_questions:
-            random_int = randint(0,12)
-            if random_int not in quiz_list:
-                quiz_list.append(random_int)
-    elif 14 <= number_of_questions <= 26:
-        while len(quiz_list) < number_of_questions:
-            random_int = randint(0,12)
-            if quiz_list.count(random_int) < 2:
-                quiz_list.append(random_int)
+    max_repeat = 1
+    if 14 <= number_of_questions <= 26:
+        max_repeat = 2
     elif 27 <= number_of_questions <= 39:
-        while len(quiz_list) < number_of_questions:
-            random_int = randint(0,12)
-            if quiz_list.count(random_int) < 3:
-                quiz_list.append(random_int)
+        max_repeat = 3
+
+    while len(quiz_list) < number_of_questions:
+        random_int = randint(0,12)
+        if quiz_list.count(random_int) < max_repeat:
+            quiz_list.append(random_int)
 
     return quiz_list
 
 # Generates list of doors according to number of questions
 def generate_doors(nr_of_questions):
-    list_of_doors = []
-    door = 0
-    while len(list_of_doors) < nr_of_questions:
-        door += 1
-        list_of_doors.append(door)
+    list_of_doors = list(range(1, nr_of_questions + 1))
     return list_of_doors
 
 # Assigns zombie door to a number witihin range of number of questions
 def generate_zombie_door(doors_left):
-    zombie_door = randint(1,doors_left)
+    zombie_door = choice(list_of_doors)
     return zombie_door
 
 # Function to create math quiz
 def generate_math_quiz(math_operator, math_table, quiz_list, math_quiz_number):
     if math_operator == "*":
             math_quiz = math_table * quiz_list[math_quiz_number]
-    elif math_operator == "/":
-            math_quiz = int(quiz_list[math_quiz_number] / math_table)
+    elif math_operator == "//":
+            math_quiz = quiz_list[math_quiz_number] // math_table
     elif math_operator == "%":
             math_quiz = quiz_list[math_quiz_number] % math_table
-    
+
     return math_quiz
 
-# Function to error handle non integer input
-def handle_integer_input(prompt, error_message):
+# Function to handle user string input
+def input_valid_str(question, error_text, possible_answers):
     while True:
-        try:
-            allowed_number = int(input(prompt))
-            return allowed_number
-        except:
-            print(error_message)
+        answer = input(question)
+        while answer not in possible_answers:
+            answer = input(f'{error_text}\n{question}')
 
+        return answer
+
+# Function to handle user integer input    
+def input_valid_int(question, error_text, min, max):
+    while True:
+        str = input(question)
+        if str.isdigit() and min <= int(str) <= max:
+            return int(str)
+        print(error_text)
         
-
+allowed_operators = ("*", "//", "%")
 game_over_scenarios = ("You suddenly hear a door break down and see a swarm of zombies flooding the room! Game Over", "Crash! Zombies flood the room and charges towards you. Game Over", "You feel a hand on your shoulder and turn back. The last thing you see are a bunch of zombie teeth. Game Over")
 game_over = False
 reset_game = True
@@ -71,67 +69,41 @@ You hear the zombies behind one of the doors but cannot figure out which.
 The only way out is to solve a mathematical question and choose the right door to the zombies!
           """)
 
-    # number needs to be between 12-39
     while reset_game:
-        nr_of_questions = handle_integer_input("Choose number of math questions between 12-39 you would like to answer: ","Input needs to be a number")
-        if 12 <= nr_of_questions <= 39:
+        nr_of_questions = input_valid_int("Choose number of math questions between 12-39 you would like to answer: ", "Input needs to be a number", 12, 39)
+        math_operator = input_valid_str(f"Choose of which math operator you would like to answer ( {' | '.join(allowed_operators)} ): ", "Operator needs to be one of the allowed operators", allowed_operators)
+        if math_operator == "*":
+            math_table = input_valid_int("Which table between 2-12 would you like the questions in?: ", "Input needs to be a number between 2-12", 2, 12)
             break
         else:
-            print("Number needs to be between 12-39")
-
-    # user inputs whcih operator to use with only allowing *, /, %
-    while True and reset_game:
-        try:
-            math_operator = input("Choose of which math operator you would like to answer ( * | / | % ): ")
-            if math_operator in ["*","%"]:
-                break
-            elif math_operator == "/":
-                print("Answers will be the integer without any decimals")
-                break
-            else:
-                print("Operator needs to be either *,/ or %")
-        except:
-            print("Incorrect input, only input either *,/ or %")
-
-    # user inputs which math table to use 
-    while reset_game:
-        if math_operator == "*":
-            math_table = handle_integer_input("Which table between 2-12 would you like the questions in?: ", "Input needs to be a number")
-            if 2 <= math_table <= 12:
-                break
-            else:
-                print("Number needs to be between 2-12")
-        else:
-            math_table = handle_integer_input("Which table between 2-5 would you like the questions in?: ", "Input needs to be a number")
-            if 2 <= math_table <= 5:
-                break
-            else:
-                print("Number needs to be between 2-5")
-
-    # Generate list of doors, list of numbers for math quiz and a door number for zombie quiz
+            math_table = input_valid_int("Which divisor between 2-5 would you like the questions in?: ", "Input needs to be a number between 2-5", 2, 5)
+            break
+    
+    # Generate list of doors, list of numbers for math quiz
     list_of_doors = generate_doors(nr_of_questions)
+    smallest_number_on_door = min(int(i) for i in list_of_doors)
+    largest_number_on_door = max(int(i) for i in list_of_doors)
     quiz_list = generate_math_quiz_list(nr_of_questions)
-    zombie_door = generate_zombie_door(len(list_of_doors))
     reset_game = False
 
     print("\nTo be able to proceed you need to correctly answer each math quiz before choosing the correct door!")
 
     # Loop for answering math quizzes and choosing door
     math_quiz_number = 0
-    while len(list_of_doors) > 1 and not game_over:
+    while len(list_of_doors) >= 1 and not game_over:
         math_quiz = generate_math_quiz(math_operator, math_table, quiz_list, math_quiz_number)
 
         if len(list_of_doors) != 1:
             print(f"Question: {math_quiz_number + 1} out of {nr_of_questions}, {math_quiz_number} correctly answered quizzes so far")
             if math_operator == "*":
-                answer = handle_integer_input(f"What is {math_table} {math_operator} {quiz_list[math_quiz_number]}: ","Input should be a number")
+                answer = input_valid_int(f"What is {math_table} {math_operator} {quiz_list[math_quiz_number]}: ","Input should be a number", 0, 500)
             else:
-                answer = handle_integer_input(f"What is {quiz_list[math_quiz_number]} {math_operator} {math_table}: ","Input should be a number")
+                answer = input_valid_int(f"What is {quiz_list[math_quiz_number]} {math_operator} {math_table}: ","Input should be a number", 0, 500)
         else:
             if math_operator == "*":
-                answer = handle_integer_input(f"Final question! What is {math_table} {math_operator} {quiz_list[math_quiz_number]}: ","Input should be a number")
+                answer = input_valid_int(f"Final question! What is {math_table} {math_operator} {quiz_list[math_quiz_number]}: ","Input should be a number", 0, 500)
             else:
-                answer = handle_integer_input(f"Final question! What is {quiz_list[math_quiz_number]} {math_operator} {math_table}: ","Input should be a number")
+                answer = input_valid_int(f"Final question! What is {quiz_list[math_quiz_number]} {math_operator} {math_table}: ","Input should be a number", 0, 500)
 
         if answer != math_quiz:
             print(f"\nYou gueesed wrong, the correct answer is: {math_quiz}")
@@ -150,17 +122,22 @@ The only way out is to solve a mathematical question and choose the right door t
             for door in list_of_doors:
                 print(door, end="| "),
             
-            chosen_door = handle_integer_input("Open door number: ", "There is no door with that sign")
-            if chosen_door != zombie_door:
-                print("\nWohoo! No zombies behind this door!")
-                print(f"The zombies were behind door nr {zombie_door}")
-                list_of_doors.remove(chosen_door)
-                zombie_door = generate_zombie_door(len(list_of_doors))
-                while zombie_door not in list_of_doors:
-                    zombie_door = randint(1,len(list_of_doors))
-            else:
-                print(game_over_scenarios[randint(0,2)])
-                game_over = True
+            while True:
+                chosen_door = input_valid_int("Open door number: ", "Please enter a number from the line above.", smallest_number_on_door, largest_number_on_door)
+                if chosen_door in list_of_doors:
+                    zombie_door = generate_zombie_door(len(list_of_doors))
+                    print(zombie_door)
+                    if chosen_door != zombie_door:
+                        print("\nWohoo! No zombies behind this door!")
+                        print(f"The zombies were behind door nr {zombie_door}")
+                        list_of_doors.remove(chosen_door)
+                        break
+                    else:
+                        print(game_over_scenarios[randint(0,2)])
+                        game_over = True
+                        break
+                else:
+                    print("There is no door with that sign")
    
     while True:
         continue_game = input("\nWould you like to play again? (y/n)").lower()
@@ -173,4 +150,3 @@ The only way out is to solve a mathematical question and choose the right door t
             break
         else:
             print("Please enter either y or n")
-            continue
