@@ -75,8 +75,6 @@ The only way out is to solve a mathematical question and choose the right door t
     
     # Generate list of doors, list of numbers for math quiz
     list_of_doors = generate_doors(nr_of_questions)
-    smallest_number_on_door = min(int(i) for i in list_of_doors)
-    largest_number_on_door = max(int(i) for i in list_of_doors)
     quiz_list = generate_math_quiz_list(nr_of_questions)
 
     print("\nTo be able to proceed you need to correctly answer each math quiz before choosing the correct door!")
@@ -85,7 +83,6 @@ The only way out is to solve a mathematical question and choose the right door t
     math_quiz_number = 0
     while len(list_of_doors) >= 1 and not game_over:
         math_quiz = generate_math_quiz(math_operator, math_table, quiz_list, math_quiz_number)
-        print(math_quiz)
         if len(list_of_doors) == 1:
             print("Final question!")
         else:
@@ -111,8 +108,7 @@ The only way out is to solve a mathematical question and choose the right door t
             
             while True:
                 zombie_door = choice(list_of_doors)
-                print(zombie_door) # remove this
-                chosen_door = input_valid_int("Open door number: ", "Please enter a number from the line above.", smallest_number_on_door, largest_number_on_door)
+                chosen_door = input_valid_int("Open door number: ", "Please enter a number from the line above.", min(list_of_doors), max(list_of_doors))
                 if chosen_door in list_of_doors:
                     if chosen_door != zombie_door:
                         print("\nWohoo! No zombies behind this door!")
@@ -120,15 +116,16 @@ The only way out is to solve a mathematical question and choose the right door t
                         list_of_doors.remove(chosen_door)
                         break
                     else:
-                        print(game_over_scenarios[randint(0,2)])
+                        print(f"\n{game_over_scenarios[randint(0,2)]}")
                         game_over = True
                         break
                 else:
                     print("There is no door with that sign")
    
     while True:
-        continue_game = input_valid_str("\nWould you like to play again? (y/n): ", "Please enter y or n",("y", "n")).lower()
+        continue_game = input_valid_str("\nWould you like to play again? (y/n): ", "Please enter y or n",("y", "n"))
         if continue_game == "y":
+            game_over = False
             break
         elif continue_game == "n":
             print("thank you for playing. goodbye")
